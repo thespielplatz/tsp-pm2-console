@@ -1,3 +1,5 @@
+// https://eff-certbot.readthedocs.io/en/stable/using.html#where-are-my-certificates
+
 const fs = require('fs')
 
 const systools = require('./systools.js')
