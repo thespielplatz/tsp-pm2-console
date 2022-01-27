@@ -1,0 +1,19 @@
+{
+  "name": "tsp-pm2-console",
+  "version": "1.0.0",
+  "description": "Console for all the tasks around pm2 for subdomains, ssl & project",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thespielplatz/tsp-pm2-console.git"
+  },
+  "author": "Philipp Horwath",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/thespielplatz/tsp-pm2-console/issues"
+  },
+  "homepage": "https://github.com/thespielplatz/tsp-pm2-console#readme"
+}
