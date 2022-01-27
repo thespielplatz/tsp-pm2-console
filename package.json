@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/thespielplatz/tsp-pm2-console/issues"
   },
-  "homepage": "https://github.com/thespielplatz/tsp-pm2-console#readme"
+  "homepage": "https://github.com/thespielplatz/tsp-pm2-console#readme",
+  "dependencies": {
+    "colors": "^1.4.0"
+  }
 }
