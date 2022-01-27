@@ -22,15 +22,5 @@ module.exports = {
             })
         })
     },
-    getPM2HOMEfromSystemdFile : (file) => {
-        try {
-            const data = fs.readFileSync(file, 'utf8')
-            const home = data.match(/PM2_HOME=.*\.pm2/g)
-            if (home == null) return false
-            return home[0].replace('PM2_HOME=', '')
-        } catch (err) {
-            return false
-        }
-    }
 }
 

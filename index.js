@@ -1,5 +1,6 @@
 const systools = require('./modules/systools.js')
 const userinput = require('./modules/userinput.js')
+const nginx = require('./modules/nginx.js')
 
 const pm2 = require('./modules/pm2.js')
 const certbot = require('./modules/certbot.js')
@@ -8,6 +9,7 @@ let CONFIG = {
     PM2_HOME : false
 };
 
+let domains = {}
 
 const guessEverything = async () => {
     // pm2 - home path
@@ -21,50 +23,52 @@ const guessEverything = async () => {
     const sslCertificates =  await certbot.guessSSLCertificates()
 }
 
-const guessNginxConfig = async () => {
-    // MAYBE: Veryfiy if nginx is running curl -I 127.0.0.1
-    // TODO: Check where nginx files are located
-    const installLocations = ['/etc/nginx', '/usr/local/nginx/conf', '/usr/local/etc/nginx']
-
-    const enabledPath = installLocations[0] + '/sites-enabled/'
-    const availablePath = installLocations[0] + '/sites-available/'
-
-    let enabledFiles = await systools.readdir(enabledPath)
-
-    if (enabledFiles === 'ENOENT') {
-        console.log(`- No such file or directory ${enabledPath}`)
-        return false
-    }
-
-    if (enabledFiles === 'EACCES') {
-        console.log(`- Permission denied to ${enabledPath}`)
-        return false
-    }
-
-    let availableFiles = await systools.readdir(availablePath)
-
-    if (availableFiles === 'ENOENT') {
-        console.log(`- No such file or directory ${enabledPath}`)
-        return false
-    }
-
-    if (availableFiles === 'EACCES') {
-        console.log(`- Permission denied to ${enabledPath}`)
-        return false
-    }
-
-    enabledFiles.forEach(file => {
-        console.log(JSON.stringify(file))
-    })
-
-    return true
-}
 
 // Call start
 (async() => {
+    //const sslCertificates =  await certbot.guessSSLCertificates()
+    //console.log(sslCertificates)
+    let domains = await nginx.guessNginxConfig(certbot.letsencryptPath)
 
-    const result = await guessNginxConfig()
-    console.log(result)
+    const ports = await pm2.getProjects()
+
+    domains.forEach(domain => {
+        if (domain.port in ports) {
+            domain.name = ports[domain.port].name
+            domain.cwd = ports[domain.port].cwd
+            domain.script = ports[domain.port].script
+            domain.status = ports[domain.port].status
+            domain.autorestart = ports[domain.port].autorestart
+            domain.watch = ports[domain.port].watch
+            domain.restart = ports[domain.port].restart
+
+        }
+    })
+
+    domains = domains.sort((a, b) => {
+        var nameA = a.domain.toUpperCase(); // ignore upper and lowercase
+        var nameB = b.domain.toUpperCase(); // ignore upper and lowercase
+        if (nameA < nameB) {
+            return -1;
+        }
+        if (nameA > nameB) {
+            return 1;
+        }
+
+        // names must be equal
+        return 0;
+    }).map(d => { return {
+        Domain: d.domain,
+        Port: d.port,
+        cert: d.ssl.length > 0 ? "yes" : "no",
+        'PM2 Name': d.name,
+        Status: d.status,
+        autorestart: ('autorestart' in d ? d.autorestart : '-'),
+        watch: ('watch' in d ? d.watch : '-'),
+        restart: ('restart' in d ? d.restart : '-')
+    }
+    })
+    console.table(domains)
     console.log("DONE")
 })();
 
