@@ -16,7 +16,9 @@ node index.js
 # or as user with sudo rights
 sudo node index.js
 ```
+# Idea
 
+- Intergrate ufw
 
 # Links
 
